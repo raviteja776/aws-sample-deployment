@@ -1,0 +1,4 @@
+body { font-family: Arial, sans-serif; margin: 2rem; }
+.app { max-width: 800px; margin: auto; }
+pre { background: #f6f8fa; padding: 1rem; border-radius: 4px; }
+.error { color: #c92a2a }
