@@ -11,8 +11,9 @@ pipeline {
     }
 
     environment {
-        AWS_CREDENTIALS = credentials('aws-credentials')
-        BACKEND_IMAGE = "${params.ECR_REGISTRY}/${params.ECR_REPO}:backend-${params.BUILD_TAG}"
+        AWS_ACCESS_KEY_ID     = credentials('aws-access-key-id')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
+        BACKEND_IMAGE  = "${params.ECR_REGISTRY}/${params.ECR_REPO}:backend-${params.BUILD_TAG}"
         FRONTEND_IMAGE = "${params.ECR_REGISTRY}/${params.ECR_REPO}:frontend-${params.BUILD_TAG}"
     }
 
@@ -27,23 +28,19 @@ pipeline {
         stage('Configure AWS Credentials') {
             steps {
                 echo '========== Configuring AWS credentials =========='
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
-                    sh '''
-                        aws configure set region ${AWS_REGION}
-                        aws sts get-caller-identity
-                    '''
-                }
+                sh '''
+                    aws configure set region ${AWS_REGION}
+                    aws sts get-caller-identity
+                '''
             }
         }
 
         stage('Login to ECR') {
             steps {
                 echo '========== Logging in to ECR =========='
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
-                    sh '''
-                        aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
-                    '''
-                }
+                sh '''
+                    aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+                '''
             }
         }
 
@@ -90,11 +87,9 @@ pipeline {
         stage('Update kubeconfig') {
             steps {
                 echo '========== Updating kubeconfig =========='
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
-                    sh '''
-                        aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_REGION}
-                    '''
-                }
+                sh '''
+                    aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_REGION}
+                '''
             }
         }
 
