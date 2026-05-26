@@ -28,8 +28,8 @@ pipeline {
         stage('Configure AWS Credentials') {
             steps {
                 echo '========== Configuring AWS credentials =========='
-                sh '''
-                    aws configure set region ${AWS_REGION}
+                bat '''
+                    aws configure set region %AWS_REGION%
                     aws sts get-caller-identity
                 '''
             }
@@ -38,8 +38,8 @@ pipeline {
         stage('Login to ECR') {
             steps {
                 echo '========== Logging in to ECR =========='
-                sh '''
-                    aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+                bat '''
+                    aws ecr get-login-password --region %AWS_REGION% | docker login --username AWS --password-stdin %ECR_REGISTRY%
                 '''
             }
         }
@@ -47,10 +47,9 @@ pipeline {
         stage('Build Backend Image') {
             steps {
                 echo '========== Building backend Docker image =========='
-                sh '''
+                bat '''
                     cd backend
-                    docker build -t ${BACKEND_IMAGE} .
-                    cd ..
+                    docker build -t %BACKEND_IMAGE% .
                 '''
             }
         }
@@ -58,10 +57,9 @@ pipeline {
         stage('Build Frontend Image') {
             steps {
                 echo '========== Building frontend Docker image =========='
-                sh '''
+                bat '''
                     cd frontend
-                    docker build --build-arg VITE_BACKEND_URL="http://backend:3000/" -t ${FRONTEND_IMAGE} .
-                    cd ..
+                    docker build --build-arg VITE_BACKEND_URL="http://backend:3000/" -t %FRONTEND_IMAGE% .
                 '''
             }
         }
@@ -69,8 +67,8 @@ pipeline {
         stage('Push Backend Image to ECR') {
             steps {
                 echo '========== Pushing backend image to ECR =========='
-                sh '''
-                    docker push ${BACKEND_IMAGE}
+                bat '''
+                    docker push %BACKEND_IMAGE%
                 '''
             }
         }
@@ -78,8 +76,8 @@ pipeline {
         stage('Push Frontend Image to ECR') {
             steps {
                 echo '========== Pushing frontend image to ECR =========='
-                sh '''
-                    docker push ${FRONTEND_IMAGE}
+                bat '''
+                    docker push %FRONTEND_IMAGE%
                 '''
             }
         }
@@ -87,8 +85,8 @@ pipeline {
         stage('Update kubeconfig') {
             steps {
                 echo '========== Updating kubeconfig =========='
-                sh '''
-                    aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ${AWS_REGION}
+                bat '''
+                    aws eks update-kubeconfig --name %EKS_CLUSTER_NAME% --region %AWS_REGION%
                 '''
             }
         }
@@ -96,8 +94,8 @@ pipeline {
         stage('Create Namespace') {
             steps {
                 echo '========== Creating Kubernetes namespace =========='
-                sh '''
-                    kubectl create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
+                bat '''
+                    kubectl create namespace %NAMESPACE% --dry-run=client -o yaml | kubectl apply -f -
                 '''
             }
         }
@@ -105,9 +103,8 @@ pipeline {
         stage('Deploy Backend to EKS') {
             steps {
                 echo '========== Deploying backend to EKS =========='
-                sh '''
-                    kubectl set image deployment/aws-sample-backend aws-sample-backend=${BACKEND_IMAGE} -n ${NAMESPACE} || \
-                    (kubectl apply -f k8s/backend-deployment.yaml -n ${NAMESPACE})
+                bat '''
+                    kubectl set image deployment/aws-sample-backend aws-sample-backend=%BACKEND_IMAGE% -n %NAMESPACE% || kubectl apply -f k8s/backend-deployment.yaml -n %NAMESPACE%
                 '''
             }
         }
@@ -115,9 +112,8 @@ pipeline {
         stage('Deploy Frontend to EKS') {
             steps {
                 echo '========== Deploying frontend to EKS =========='
-                sh '''
-                    kubectl set image deployment/aws-sample-frontend aws-sample-frontend=${FRONTEND_IMAGE} -n ${NAMESPACE} || \
-                    (kubectl apply -f k8s/frontend-deployment.yaml -n ${NAMESPACE})
+                bat '''
+                    kubectl set image deployment/aws-sample-frontend aws-sample-frontend=%FRONTEND_IMAGE% -n %NAMESPACE% || kubectl apply -f k8s/frontend-deployment.yaml -n %NAMESPACE%
                 '''
             }
         }
@@ -125,13 +121,13 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 echo '========== Verifying deployment =========='
-                sh '''
-                    kubectl rollout status deployment/aws-sample-backend -n ${NAMESPACE} --timeout=5m
-                    kubectl rollout status deployment/aws-sample-frontend -n ${NAMESPACE} --timeout=5m
-                    echo "========== Pods status =========="
-                    kubectl get pods -n ${NAMESPACE}
-                    echo "========== Services =========="
-                    kubectl get svc -n ${NAMESPACE}
+                bat '''
+                    kubectl rollout status deployment/aws-sample-backend -n %NAMESPACE% --timeout=5m
+                    kubectl rollout status deployment/aws-sample-frontend -n %NAMESPACE% --timeout=5m
+                    echo Pods status:
+                    kubectl get pods -n %NAMESPACE%
+                    echo Services:
+                    kubectl get svc -n %NAMESPACE%
                 '''
             }
         }
@@ -140,8 +136,8 @@ pipeline {
     post {
         always {
             echo '========== Cleaning up =========='
-            sh '''
-                docker logout ${ECR_REGISTRY} || true
+            bat '''
+                docker logout %ECR_REGISTRY%
             '''
         }
         success {
