@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: aws-sample-backend
-        image: aws-sample-backend:latest
+        image: 885686551889.dkr.ecr.ap-south-2.amazonaws.com/explore/aws-sample-deployment:backend-latest
         imagePullPolicy: Always
         ports:
         - containerPort: 3000

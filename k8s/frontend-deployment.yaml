@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: aws-sample-frontend
-        image: aws-sample-frontend:latest
+        image: 885686551889.dkr.ecr.ap-south-2.amazonaws.com/explore/aws-sample-deployment:frontend-latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80

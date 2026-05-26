@@ -2,17 +2,18 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'AWS_REGION', defaultValue: 'us-east-1', description: 'AWS region')
-        string(name: 'EKS_CLUSTER_NAME', defaultValue: 'my-eks-cluster', description: 'EKS cluster name')
-        string(name: 'ECR_REGISTRY', defaultValue: '885686551889.dkr.ecr.ap-south-2.amazonaws.com/explore/aws-sample-deployment', description: 'ECR registry URL')
+        string(name: 'AWS_REGION', defaultValue: 'ap-south-2', description: 'AWS region')
+        string(name: 'EKS_CLUSTER_NAME', defaultValue: 'aws-deploy-eks-cluster', description: 'EKS cluster name')
+        string(name: 'ECR_REGISTRY', defaultValue: '885686551889.dkr.ecr.ap-south-2.amazonaws.com', description: 'ECR registry host')
+        string(name: 'ECR_REPO', defaultValue: 'explore/aws-sample-deployment', description: 'ECR repository name')
         string(name: 'NAMESPACE', defaultValue: 'default', description: 'Kubernetes namespace')
         string(name: 'BUILD_TAG', defaultValue: 'latest', description: 'Docker image tag')
     }
 
     environment {
         AWS_CREDENTIALS = credentials('aws-credentials')
-        BACKEND_IMAGE = "${params.ECR_REGISTRY}/aws-sample-backend:${params.BUILD_TAG}"
-        FRONTEND_IMAGE = "${params.ECR_REGISTRY}/aws-sample-frontend:${params.BUILD_TAG}"
+        BACKEND_IMAGE = "${params.ECR_REGISTRY}/${params.ECR_REPO}:backend-${params.BUILD_TAG}"
+        FRONTEND_IMAGE = "${params.ECR_REGISTRY}/${params.ECR_REPO}:frontend-${params.BUILD_TAG}"
     }
 
     stages {
