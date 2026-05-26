@@ -4,7 +4,7 @@ pipeline {
     parameters {
         string(name: 'AWS_REGION', defaultValue: 'us-east-1', description: 'AWS region')
         string(name: 'EKS_CLUSTER_NAME', defaultValue: 'my-eks-cluster', description: 'EKS cluster name')
-        string(name: 'ECR_REGISTRY', defaultValue: '123456789.dkr.ecr.us-east-1.amazonaws.com', description: 'ECR registry URL')
+        string(name: 'ECR_REGISTRY', defaultValue: '885686551889.dkr.ecr.ap-south-2.amazonaws.com/explore/aws-sample-deployment', description: 'ECR registry URL')
         string(name: 'NAMESPACE', defaultValue: 'default', description: 'Kubernetes namespace')
         string(name: 'BUILD_TAG', defaultValue: 'latest', description: 'Docker image tag')
     }
