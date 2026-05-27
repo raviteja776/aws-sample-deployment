@@ -6,7 +6,7 @@ pipeline {
         string(name: 'EKS_CLUSTER_NAME', defaultValue: 'aws-deploy-eks-cluster', description: 'EKS cluster name')
         string(name: 'ECR_REGISTRY', defaultValue: '885686551889.dkr.ecr.ap-south-2.amazonaws.com', description: 'ECR registry host')
         string(name: 'ECR_REPO', defaultValue: 'explore/aws-sample-deployment', description: 'ECR repository name')
-        string(name: 'BACKEND_URL', defaultValue: '', description: 'Backend LoadBalancer EXTERNAL-IP (e.g. xxxx.elb.ap-south-2.amazonaws.com:3000)')
+        string(name: 'BACKEND_URL', defaultValue: 'k8s-default-awssampl-a16a29c299-8a0820fd0683abe9.elb.ap-south-2.amazonaws.com:3000', description: 'Backend LoadBalancer EXTERNAL-IP')
         string(name: 'NAMESPACE', defaultValue: 'default', description: 'Kubernetes namespace')
         string(name: 'BUILD_TAG', defaultValue: 'latest', description: 'Docker image tag')
     }
